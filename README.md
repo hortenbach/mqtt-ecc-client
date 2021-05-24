@@ -8,7 +8,7 @@ add wifi/wifisecrets.h with your wifi credential or comment out wifisecrets.h in
 # tcp
 
 # mbed TLS
-Place your ca.crt into the cert folder
+Place your ca.pem into the main folder
 
 ## RSA
 ## ECC
