@@ -28,6 +28,5 @@ void app_main(void)
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
-    printf("Hello World!");
     ESP_LOGI(TAG, "HELLO_WORLD");
 }
