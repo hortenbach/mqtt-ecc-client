@@ -6,4 +6,3 @@
 PROJECT_NAME := esp_mqtt_ecc
 
 include $(IDF_PATH)/make/project.mk
-

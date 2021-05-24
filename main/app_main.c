@@ -16,6 +16,21 @@
 #include "mqtt/mqttclient.h"
 
 
+// #include "ecc/ecc_task.h"
+
+// #define TAG "MAIN"
+
+/** TODO
+ * 
+void ecc_test() {
+    // ESP_LOGI(TAG,"free DRAM %u IRAM %u",esp_get_free_heap_size(),xPortGetFreeHeapSizeTagged(MALLOC_CAP_32BIT));
+    ESP_LOGI(TAG,"free DRAM %u IRAM %u",esp_get_free_heap_size(),xPortGetFreeHeapSize());
+    xTaskCreate(ecc_task, "gpio_task", 12288, NULL, 5, NULL);
+
+}
+*/
+
+
 void app_main(void)
 {
     //Initialize NVS (Non Volatile Storage)
@@ -25,10 +40,10 @@ void app_main(void)
       ESP_ERROR_CHECK(nvs_flash_erase());
       ret = nvs_flash_init();
     }
-    ESP_ERROR_CHECK(ret);
+    // ESP_ERROR_CHECK(ret);
     // ESP_ERROR_CHECK(nvs_flash_init());
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    // ESP_ERROR_CHECK(esp_netif_init());
+    // ESP_ERROR_CHECK(esp_event_loop_create_default());
 
 
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
@@ -36,7 +51,9 @@ void app_main(void)
 
     ESP_LOGI(TAG, "HELLO_WORLD");
 
-    // mqtt_app_main();
-    // mqtt_rsa_app_start();
-    ESP_LOGI(TAG, "HELLO MQTT");
+    // ecc_test();
+    // ESP_LOGI(TAG, "Done ECC test.");
+
+    mqtt_rsa_app_start();
+    ESP_LOGI(TAG, "Done MQTT.");
 }
