@@ -4,3 +4,5 @@ cmake_minimum_required(VERSION 3.5)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(esp_mqtt_ecc)
+
+target_add_binary_data(esp_mqtt_ecc.elf "main/cert/ca.pem" TEXT)
