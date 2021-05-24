@@ -11,6 +11,7 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#include "main.h"
 #include "wifisecrets.h"
 
 /* set values in your wifisicrets.h or change here directly 
@@ -27,8 +28,6 @@ static EventGroupHandle_t s_wifi_event_group;
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
-
-static const char *TAG = "wifi station";
 
 static int s_retry_num = 0;
 
