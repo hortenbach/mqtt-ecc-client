@@ -1,7 +1,3 @@
-// #include <stdio.h>
-// #include <stdint.h>
-// #include <stddef.h>
-// #include <string.h>
 #include "esp_system.h"
 #include "nvs_flash.h"
 #include "esp_event.h"
@@ -9,14 +5,12 @@
 // #include "protocol_examples_common.h"
 
 #include "esp_log.h"
-#include "mqtt_client.h"
 #include "esp_tls.h"
 #include "esp_ota_ops.h"
 #include <sys/param.h>
 
-
-extern const uint8_t ca_pem_start[]   asm("_binary_ca_pem_start");
-extern const uint8_t ca_pem_end[]   asm("_binary_ca_pem_end");
+#include "mqttclient.h"
+#include "project.h"
 
 //
 // Note: this function is for testing purposes only publishing part of the active partition
@@ -44,7 +38,7 @@ static void send_binary(esp_mqtt_client_handle_t client)
  * @param event_id The id for the received event.
  * @param event_data The data for the event, esp_mqtt_event_handle_t.
  */
-static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
+void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
@@ -105,33 +99,18 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     }
 }
 
-static void mqtt_app_start(void)
+void mqtt_rsa_app_start(void)
 {
     const esp_mqtt_client_config_t mqtt_cfg = {
-        .uri = CONFIG_BROKER_URI,
+        .uri = BROKER_URI,
+        //.event_handle = mqtt_event_handler(),
         .cert_pem = (const char *)ca_pem_start,
     };
 
     ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
     /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
-    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, NULL);
+    const char* testdata = "MQTT Testdata 12345";
+    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, &testdata);
     esp_mqtt_client_start(client);
-}
-
-void mqtt_app_main(void)
-{
-    ESP_LOGI(TAG, "[APP] Startup..");
-    ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
-    ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
-
-    esp_log_level_set("*", ESP_LOG_INFO);
-    esp_log_level_set("esp-tls", ESP_LOG_VERBOSE);
-    esp_log_level_set("MQTT_CLIENT", ESP_LOG_VERBOSE);
-    esp_log_level_set("MQTT_EXAMPLE", ESP_LOG_VERBOSE);
-    esp_log_level_set("TRANSPORT_BASE", ESP_LOG_VERBOSE);
-    esp_log_level_set("TRANSPORT", ESP_LOG_VERBOSE);
-    esp_log_level_set("OUTBOX", ESP_LOG_VERBOSE);
-
-    mqtt_app_start();
 }

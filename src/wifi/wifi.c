@@ -11,18 +11,10 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-#include "main.h"
-#include "wifisecrets.h"
-
-/* set values in your wifisicrets.h or change here directly 
-*/
-#define EXAMPLE_ESP_WIFI_SSID      CONFIG_WIFI_SSID
-#define EXAMPLE_ESP_WIFI_PASS      CONFIG_WIFI_PASSWORD
-#define EXAMPLE_ESP_MAXIMUM_RETRY  CONFIG_MAXIMUM_RETRY
+#include "wifi.h"
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t s_wifi_event_group;
-
 /* The event group allows multiple bits for each event, but we only care about two events:
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */

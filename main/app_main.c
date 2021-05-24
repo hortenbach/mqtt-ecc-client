@@ -11,7 +11,9 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+#include "project.h"
 #include "wifi/wifi.c"
+#include "mqtt/mqttclient.h"
 
 
 void app_main(void)
@@ -24,9 +26,17 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    // ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
 
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
     ESP_LOGI(TAG, "HELLO_WORLD");
+
+    // mqtt_app_main();
+    // mqtt_rsa_app_start();
+    ESP_LOGI(TAG, "HELLO MQTT");
 }
