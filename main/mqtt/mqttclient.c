@@ -12,7 +12,7 @@
 #include "mqttclient.h"
 #include "project.h"
 
-#define CONFIG_MQTT_PROTOCOL_311
+// #define CONFIG_MQTT_PROTOCOL_311
 
 #define CONFIG_BROKER_BIN_SIZE_TO_SEND 20000
 #define BROKER_URI "mqtts://yoga.fritz.box:8883"
@@ -104,17 +104,71 @@ void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event
     }
 }
 
+// void mqtt_pub(esp_mqtt_client_handle_t client){
+//  const char* testdata = "MQTT Testdata 12345";
+//  esp_mqtt_client_publish(client, "/topic/qos0", testdata, 0, 0, 1);
+// }
+
 void mqtt_rsa_app_start(void)
 {
+//     const esp_mqtt_client_config_t mqtt_cfg = {
+//     mqtt_event_callback_t event_handle;     /*!< handle for MQTT events as a callback in legacy mode */
+//     esp_event_loop_handle_t event_loop_handle; /*!< handle for MQTT event loop library */
+//     const char *host;                       /*!< MQTT server domain (ipv4 as string) */
+//     const char *uri;                        /*!< Complete MQTT broker URI */
+//     uint32_t port;                          /*!< MQTT server port */
+//     const char *client_id;                  /*!< default client id is ``ESP32_%CHIPID%`` where %CHIPID% are last 3 bytes of MAC address in hex format */
+//     const char *username;                   /*!< MQTT username */
+//     const char *password;                   /*!< MQTT password */
+//     const char *lwt_topic;                  /*!< LWT (Last Will and Testament) message topic (NULL by default) */
+//     const char *lwt_msg;                    /*!< LWT message (NULL by default) */
+//     int lwt_qos;                            /*!< LWT message qos */
+//     int lwt_retain;                         /*!< LWT retained message flag */
+//     int lwt_msg_len;                        /*!< LWT message length */
+//     int disable_clean_session;              /*!< mqtt clean session, default clean_session is true */
+//     int keepalive;                          /*!< mqtt keepalive, default is 120 seconds */
+//     bool disable_auto_reconnect;            /*!< this mqtt client will reconnect to server (when errors/disconnect). Set disable_auto_reconnect=true to disable */
+//     void *user_context;                     /*!< pass user context to this option, then can receive that context in ``event->user_context`` */
+//     int task_prio;                          /*!< MQTT task priority, default is 5, can be changed in ``make menuconfig`` */
+//     int task_stack;                         /*!< MQTT task stack size, default is 6144 bytes, can be changed in ``make menuconfig`` */
+//     int buffer_size;                        /*!< size of MQTT send/receive buffer, default is 1024 (only receive buffer size if ``out_buffer_size`` defined) */
+//     const char *cert_pem;                   /*!< Pointer to certificate data in PEM or DER format for server verify (with SSL), default is NULL, not required to verify the server. PEM-format must have a terminating NULL-character. DER-format requires the length to be passed in cert_len. */
+//     size_t cert_len;                        /*!< Length of the buffer pointed to by cert_pem. May be 0 for null-terminated pem */
+//     const char *client_cert_pem;            /*!< Pointer to certificate data in PEM or DER format for SSL mutual authentication, default is NULL, not required if mutual authentication is not needed. If it is not NULL, also `client_key_pem` has to be provided. PEM-format must have a terminating NULL-character. DER-format requires the length to be passed in client_cert_len. */
+//     size_t client_cert_len;                 /*!< Length of the buffer pointed to by client_cert_pem. May be 0 for null-terminated pem */
+//     const char *client_key_pem;             /*!< Pointer to private key data in PEM or DER format for SSL mutual authentication, default is NULL, not required if mutual authentication is not needed. If it is not NULL, also `client_cert_pem` has to be provided. PEM-format must have a terminating NULL-character. DER-format requires the length to be passed in client_key_len */
+//     size_t client_key_len;                  /*!< Length of the buffer pointed to by client_key_pem. May be 0 for null-terminated pem */
+//     esp_mqtt_transport_t transport;         /*!< overrides URI transport */
+//     int refresh_connection_after_ms;        /*!< Refresh connection after this value (in milliseconds) */
+//     const struct psk_key_hint* psk_hint_key;     /*!< Pointer to PSK struct defined in esp_tls.h to enable PSK authentication (as alternative to certificate verification). If not NULL and server/client certificates are NULL, PSK is enabled */
+//     bool          use_global_ca_store;      /*!< Use a global ca_store for all the connections in which this bool is set. */
+//     int reconnect_timeout_ms;               /*!< Reconnect to the broker after this value in miliseconds if auto reconnect is not disabled (defaults to 10s) */
+//     const char **alpn_protos;               /*!< NULL-terminated list of supported application protocols to be used for ALPN */
+//     const char *clientkey_password;         /*!< Client key decryption password string */
+//     int clientkey_password_len;             /*!< String length of the password pointed to by clientkey_password */
+//     esp_mqtt_protocol_ver_t protocol_ver;   /*!< MQTT protocol version used for connection, defaults to value from menuconfig*/
+//     int out_buffer_size;                    /*!< size of MQTT output buffer. If not defined, both output and input buffers have the same size defined as ``buffer_size`` */
+//     bool skip_cert_common_name_check;       /*!< Skip any validation of server certificate CN field, this reduces the security of TLS and makes the mqtt client susceptible to MITM attacks  */
+//     bool use_secure_element;                /*!< enable secure element for enabling SSL connection */
+//     void *ds_data;                          /*!< carrier of handle for digital signature parameters */
+//     int network_timeout_ms;                 /*!< Abort network operation if it is not completed after this value, in milliseconds (defaults to 10s) */
+//     bool disable_keepalive;                 /*!< Set disable_keepalive=true to turn off keep-alive mechanism, false by default (keepalive is active by default). Note: setting the config value `keepalive` to `0` doesn't disable keepalive feature, but uses a default keepalive period */
+// } ;
+
+
     const esp_mqtt_client_config_t mqtt_cfg = {
         .uri = BROKER_URI,
+        // .event_loop_handle = ,
         .cert_pem = (const char *)ca_pem_start,
     };
-
-    ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
+    ESP_LOGI(TAG, "Free memory: %d bytes", esp_get_free_heap_size());
+    
+    /* new client */
     esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-    /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
     const char* testdata = "MQTT Testdata 12345";
-    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, &testdata);
+    /* The last argument may be used to pass data to the event handler, in this example mqtt_event_handler */
+    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, 0);
     esp_mqtt_client_start(client);
+    // esp_mqtt_client_publish(client, "/topic/qos0", testdata, 0, 0, 1);
 }
+
