@@ -15,10 +15,14 @@
 #include "wifi/wifi.c"
 #include "mqtt/mqttclient.h"
 
+#include "esp_sleep.h"
 
 // #include "ecc/ecc_task.h"
 
 // #define TAG "MAIN"
+
+#define uS_TO_S_FACTOR 1000000
+#define TIME_TO_SLEEP_IN_SECONDS 30
 
 /** TODO
  * 
@@ -45,7 +49,6 @@ void app_main(void)
     // ESP_ERROR_CHECK(esp_netif_init());
     // ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
@@ -53,7 +56,11 @@ void app_main(void)
 
     // ecc_test();
     // ESP_LOGI(TAG, "Done ECC test.");
-
+    
     mqtt_rsa_app_start();
     ESP_LOGI(TAG, "Done MQTT.");
+
+    ESP_LOGI(TAG, "Entering Sleep Mode");
+    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP_IN_SECONDS*uS_TO_S_FACTOR);
+    esp_deep_sleep_start();
 }
