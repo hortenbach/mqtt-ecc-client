@@ -1,5 +1,0 @@
-*.pem
-main/wifi/wifisecrets.h
-.vscode/
-build/
-sdkconfig
