@@ -15,14 +15,12 @@
 #include "wifi/wifi.c"
 #include "mqtt/mqttclient.h"
 
-#include "esp_sleep.h"
+
+#define START_STOP_PIN 13
 
 // #include "ecc/ecc_task.h"
 
 // #define TAG "MAIN"
-
-#define uS_TO_S_FACTOR 1000000
-#define TIME_TO_SLEEP_IN_SECONDS 30
 
 /** TODO
  * 
@@ -33,7 +31,19 @@ void ecc_test() {
 
 }
 */
+void setup_gpio(void){
+  //gpio_config_t * pGPIOConfig;
+  gpio_pad_select_gpio(START_STOP_PIN);
+  gpio_set_direction(START_STOP_PIN, GPIO_MODE_OUTPUT);
+}
 
+void start_measure(void){
+  gpio_set_level(START_STOP_PIN,1);
+}
+
+void stop_measure(void){
+  gpio_set_level(START_STOP_PIN,0);
+}
 
 void app_main(void)
 {
@@ -60,7 +70,4 @@ void app_main(void)
     mqtt_rsa_app_start();
     ESP_LOGI(TAG, "Done MQTT.");
 
-    ESP_LOGI(TAG, "Entering Sleep Mode");
-    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP_IN_SECONDS*uS_TO_S_FACTOR);
-    esp_deep_sleep_start();
 }
