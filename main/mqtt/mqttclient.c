@@ -12,10 +12,12 @@
 #include "mqttclient.h"
 #include "project.h"
 
+#include "wifisecrets.h"
+#include "sleep.h"
+
 #define CONFIG_MQTT_PROTOCOL_311
 
 #define CONFIG_BROKER_BIN_SIZE_TO_SEND 20000
-#define BROKER_URI "mqtts://yoga.fritz.box:8883"
 
 //
 // Note: this function is for testing purposes only publishing part of the active partition
@@ -45,6 +47,9 @@ static void send_binary(esp_mqtt_client_handle_t client)
  */
 void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
+    static RTC_DATA_ATTR int bootCount = 0;
+    char str[80];
+
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     esp_mqtt_event_handle_t event = event_data;
     esp_mqtt_client_handle_t client = event->client;
@@ -52,38 +57,30 @@ void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event
     switch ((esp_mqtt_event_id_t)event_id) {
     case MQTT_EVENT_CONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_CONNECTED");
-        msg_id = esp_mqtt_client_subscribe(client, "/topic/qos0", 0);
-        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-        msg_id = esp_mqtt_client_subscribe(client, "/topic/qos1", 1);
-        ESP_LOGI(TAG, "sent subscribe successful, msg_id=%d", msg_id);
-
-        msg_id = esp_mqtt_client_unsubscribe(client, "/topic/qos1");
-        ESP_LOGI(TAG, "sent unsubscribe successful, msg_id=%d", msg_id);
+        do{
+            sprintf(str,"Boot Counter = %d",bootCount);
+            msg_id = esp_mqtt_client_publish(client, "/gompbach/sensordata", str, 0, 2, 0);
+            ESP_LOGI(TAG, "event->msg_id = %d", event->msg_id);
+            ESP_LOGI(TAG, "msg_id=%d", msg_id);
+        }
+        while(msg_id == -1);
+        bootCount++;
         break;
     case MQTT_EVENT_DISCONNECTED:
         ESP_LOGI(TAG, "MQTT_EVENT_DISCONNECTED");
         break;
-
     case MQTT_EVENT_SUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-        msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
-        ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
         break;
     case MQTT_EVENT_UNSUBSCRIBED:
         ESP_LOGI(TAG, "MQTT_EVENT_UNSUBSCRIBED, msg_id=%d", event->msg_id);
         break;
     case MQTT_EVENT_PUBLISHED:
         ESP_LOGI(TAG, "MQTT_EVENT_PUBLISHED, msg_id=%d", event->msg_id);
+        goToSleep();
         break;
     case MQTT_EVENT_DATA:
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
-        printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
-        printf("DATA=%.*s\r\n", event->data_len, event->data);
-        // if (strncmp(event->data, "send binary please", event->data_len) == 0) {
-        //     ESP_LOGI(TAG, "Sending the binary");
-        //     send_binary(client);
-        // }
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -97,6 +94,9 @@ void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event
         } else {
             ESP_LOGW(TAG, "Unknown error type: 0x%x", event->error_handle->error_type);
         }
+        break;
+    case MQTT_EVENT_BEFORE_CONNECT:
+        ESP_LOGI(TAG, "MQTT_EVENT_BEFORE_CONNECT");
         break;
     default:
         ESP_LOGI(TAG, "Other event id:%d", event->event_id);

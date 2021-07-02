@@ -16,6 +16,8 @@
 #include "mqtt/mqttclient.h"
 
 
+#define START_STOP_PIN 13
+
 // #include "ecc/ecc_task.h"
 
 // #define TAG "MAIN"
@@ -29,7 +31,19 @@ void ecc_test() {
 
 }
 */
+void setup_gpio(void){
+  //gpio_config_t * pGPIOConfig;
+  gpio_pad_select_gpio(START_STOP_PIN);
+  gpio_set_direction(START_STOP_PIN, GPIO_MODE_OUTPUT);
+}
 
+void start_measure(void){
+  gpio_set_level(START_STOP_PIN,1);
+}
+
+void stop_measure(void){
+  gpio_set_level(START_STOP_PIN,0);
+}
 
 void app_main(void)
 {
@@ -45,7 +59,6 @@ void app_main(void)
     // ESP_ERROR_CHECK(esp_netif_init());
     // ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
@@ -53,7 +66,8 @@ void app_main(void)
 
     // ecc_test();
     // ESP_LOGI(TAG, "Done ECC test.");
-
+    
     mqtt_rsa_app_start();
     ESP_LOGI(TAG, "Done MQTT.");
+
 }
