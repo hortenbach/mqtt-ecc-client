@@ -25,8 +25,10 @@
 static const char *TAG = "MQTTS_EXAMPLE";
 
 
+
 // extern const uint8_t mqtt_pem_start[]   asm("_binary_mqtt_pem_start");
 extern const uint8_t mqtt_pem_start[]   asm("_binary_ca_pem_start");
+
 // extern const uint8_t mqtt_eclipse_org_pem_end[]   asm("_binary_mqtt_eclipse_org_pem_end");
 extern const uint8_t mqtt_pem_end[]   asm("_binary_ca_pem_end");
 
