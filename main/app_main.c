@@ -15,8 +15,6 @@
 
 static const char *TAG = "MQTTS_EXAMPLE";
 
-
-
 // extern const uint8_t mqtt_pem_start[]   asm("_binary_mqtt_pem_start");
 extern const uint8_t mqtt_pem_start[]   asm("_binary_ca_pem_start");
 
