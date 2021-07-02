@@ -25,15 +25,13 @@ extern const uint8_t mqtt_pem_end[]   asm("_binary_ca_pem_end");
 // Note: this function is for testing purposes only publishing the entire active partition
 //       (to be checked against the original binary)
 //
-static void send_binary(esp_mqtt_client_handle_t client)
+static void send_mqtt(esp_mqtt_client_handle_t client)
 {
-    spi_flash_mmap_handle_t out_handle;
-    const void *binary_address;
-    const esp_partition_t* partition = esp_ota_get_running_partition();
-    esp_partition_mmap(partition, 0, partition->size, SPI_FLASH_MMAP_DATA, &binary_address, &out_handle);
-    int msg_id = esp_mqtt_client_publish(client, "/topic/binary", binary_address, partition->size, 0, 0);
-    ESP_LOGI(TAG, "binary sent with msg_id=%d", msg_id);
+    const void *hallo = "hallo!";
+    int msg_id = esp_mqtt_client_publish(client, "/topic/binary", hallo, sizeof(hallo)*sizeof(char), 0, 0);
+    ESP_LOGI(TAG, "mqtt message sent with msg_id=%d", msg_id);
 }
+
 
 static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 {
@@ -58,7 +56,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 
         case MQTT_EVENT_SUBSCRIBED:
             ESP_LOGI(TAG, "MQTT_EVENT_SUBSCRIBED, msg_id=%d", event->msg_id);
-            msg_id = esp_mqtt_client_publish(client, "/topic/qos0", "data", 0, 0, 0);
+            int t = mqtt_tls_get_connection_Time();
+            char msg[16]; 
+            sprintf(msg, "%d", t);
+            msg_id = esp_mqtt_client_publish(client, "/topic/qos0", msg, 0, 0, 0);
             ESP_LOGI(TAG, "sent publish successful, msg_id=%d", msg_id);
             break;
         case MQTT_EVENT_UNSUBSCRIBED:
@@ -73,7 +74,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
             printf("DATA=%.*s\r\n", event->data_len, event->data);
             if (strncmp(event->data, "send binary please", event->data_len) == 0) {
                 ESP_LOGI(TAG, "Sending the binary");
-                send_binary(client);
+                send_mqtt(client);
             }
             break;
         case MQTT_EVENT_ERROR:
@@ -97,19 +98,6 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
 static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
     ESP_LOGD(TAG, "Event dispatched from event loop base=%s, event_id=%d", base, event_id);
     mqtt_event_handler_cb(event_data);
-}
-
-static void mqtt_app_start(void)
-{
-    const esp_mqtt_client_config_t mqtt_cfg = {
-        .uri = CONFIG_BROKER_URI,
-        .cert_pem = (const char *)mqtt_pem_start,
-    };
-
-    ESP_LOGI(TAG, "[APP] Free memory: %d bytes", esp_get_free_heap_size());
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
-    esp_mqtt_client_start(client);
 }
 
 void app_main(void)
@@ -137,5 +125,21 @@ void app_main(void)
      */
     ESP_ERROR_CHECK(example_connect());
 
-    mqtt_app_start();
+    /* Begin MQTT TLS */
+    // init config struct
+    const esp_mqtt_client_config_t mqtt_cfg = {
+        .uri = CONFIG_BROKER_URI,
+        .cert_pem = (const char *)mqtt_pem_start,
+    };
+
+    // create client
+    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
+    esp_mqtt_client_start(client);
+    while(1){
+        esp_mqtt_client_disconnect(client);
+        esp_mqtt_client_reconnect(client);
+        vTaskDelay(1000);
+    }
+
 }
