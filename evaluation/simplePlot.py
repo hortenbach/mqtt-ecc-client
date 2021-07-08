@@ -19,6 +19,7 @@ def getData():
   return data
 
 def cleanDataset(dset):
+  print("Dataset original length: " + str(len(dset)))
   last = 0
   start = []
   for idx, val in enumerate(dset):
@@ -35,6 +36,17 @@ def cleanDataset(dset):
       dClean.append(s[:6000])  
   dClean.pop(0)
   return dClean
+
+def evaluateAVGT(data, name):
+  avg = 0
+  t = 0
+  for d in data:
+    avg =avg + np.average(d)
+    t = t + len(d)
+  t = t/len(data)
+  print("AVG curr all \t" + name + "  :\t" + str(avg))
+  print("AVG t all \t" + name + "  :\t" + str(t))
+
 
 def writeEval(data, PATH, plottitle):
   avg = 0
@@ -53,6 +65,7 @@ def writeEval(data, PATH, plottitle):
     istr = "Plot " + str(i) + " avg: " + str(avgPlot)
     # print(istr)
     itxt.write(istr + "\n")
+  print("AVG all " + plottitle + "  :" + str(avg))
   itxt.close()
 
 def checkDir(fdir):
@@ -76,16 +89,21 @@ checkDir(folder5)
 dataSets = getData()
 
 ecc = cleanDataset(dataSets['ecc_without_ACC_4124s'])
-writeEval(ecc, folder1+'ecc_without_ACC_', 'TLS ECC without HW Acceleration (MPI)')
+# writeEval(ecc, folder1+'ecc_without_ACC_', 'TLS ECC without HW Acceleration (MPI)')
+evaluateAVGT(ecc, 'TLS ECC without HW Acceleration (MPI)')
 
 eccAcc = cleanDataset(dataSets['ecc_with_ACC_4541s'])
-writeEval(eccAcc, folder2+'ecc_with_ACC_', 'TLS ECC with HW Acceleration (MPI)')
+# writeEval(eccAcc, folder2+'ecc_with_ACC_', 'TLS ECC with HW Acceleration (MPI)')
+evaluateAVGT(eccAcc, 'TLS ECC with HW Acceleration (MPI)')
 
 rsa = cleanDataset(dataSets['rsa_without_ACC_3967s'])
-writeEval(rsa, folder3+'rsa_without_ACC_', 'TLS RSA without HW Acceleration (MPI)')
+# writeEval(rsa, folder3+'rsa_without_ACC_', 'TLS RSA without HW Acceleration (MPI)')
+evaluateAVGT(rsa, 'TLS RSA without HW Acceleration (MPI)')
 
 rsaAcc = cleanDataset(dataSets['rsa_with_ACC_4125s'])
-writeEval(rsaAcc, folder4+'rsa_with_ACC_', 'TLS RSA with HW Acceleration (MPI)')
+# writeEval(rsaAcc, folder4+'rsa_with_ACC_', 'TLS RSA with HW Acceleration (MPI)')
+evaluateAVGT(rsaAcc, 'TLS RSA with HW Acceleration (MPI)')
 
 mqtt = cleanDataset(dataSets['mqtt_without_TLS_3561s'])
-writeEval(mqtt, folder5+'mqtt_without_TLS_', 'MQTT without TLS')
+# writeEval(mqtt, folder5+'mqtt_without_TLS_', 'MQTT without TLS')
+evaluateAVGT(mqtt, 'MQTT without TLS')
