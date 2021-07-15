@@ -44,8 +44,8 @@ def evaluateAVGT(data, name):
     avg =avg + np.average(d)
     t = t + len(d)
   t = t/len(data)
-  avg = avg/len(data)
-  print("AVG curr all \t" + name + "  :\t" + str(avg))
+  avg = avg/float(len(data))
+  print("AVG curr all \t" + name + "  :\t" + (str(avg))[0:7])
   print("AVG t all \t" + name + "  :\t" + str(t))
 
 
@@ -59,14 +59,16 @@ def writeEval(data, PATH, plottitle):
     for j in range(10):
       avgPlot = np.average(data[i*j])
       avg = avg + np.average(data[i*j])
-      ax.plot(data[i*j], label="avg "+str(avgPlot))
+      ax.plot(data[i*j], label="Ampere avg "+ (str(avgPlot))[0:6])
+    plt.xlabel("Samples")
+    plt.ylabel("Ampere")
     ax.legend()
     fig.savefig(PATH + str(i) + '.png')
     plt.close(fig)
-    istr = "Plot " + str(i) + " avg: " + str(avg/10)
+    istr = "Plot " + str(i) + " avg: " + (str(avg/10.0)[0:7])
     # print(istr)
     itxt.write(istr + "\n")
-  print("AVG all " + plottitle + "  :" + str(avg/len(data)))
+  print("AVG all " + plottitle + "  :" + (str(avg/len(data))[0:7]))
   itxt.close()
 
 def checkDir(fdir):
