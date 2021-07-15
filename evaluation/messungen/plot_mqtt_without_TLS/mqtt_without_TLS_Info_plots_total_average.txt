@@ -43,3 +43,8 @@ Plot 1 avg: 0.05250
 Plot 2 avg: 0.07278
 Plot 3 avg: 0.09248
 Plot 4 avg: 0.11416
+Plot 0 avg: 0.03146
+Plot 1 avg: 0.05250
+Plot 2 avg: 0.07278
+Plot 3 avg: 0.09248
+Plot 4 avg: 0.11416

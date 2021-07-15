@@ -64,6 +64,8 @@ def writeEval(data, PATH, plottitle):
     plt.ylabel("Ampere")
     ax.legend()
     fig.savefig(PATH + str(i) + '.png')
+    plt.cla()
+    plt.clf()
     plt.close(fig)
     istr = "Plot " + str(i) + " avg: " + (str(avg/10.0)[0:7])
     # print(istr)
